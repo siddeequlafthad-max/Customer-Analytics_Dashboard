@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer & Marketing Analytics Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue:     #0F52BA;
+    --blue-lt:  #3A7BD5;
+    --cyan:     #00C2CB;
+    --green:    #00C897;
+    --orange:   #FF6B35;
+    --yellow:   #FFD166;
+    --dark:     #080E1A;
+    --dark2:    #0D1526;
+    --dark3:    #111E35;
+    --card:     #131F38;
+    --border:   rgba(255,255,255,0.07);
+    --text:     #E8EEF8;
+    --muted:    #6B7FA3;
+  }
+
+  body {
+    background: #050A14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .wrap {
+    width: 960px;
+    background: var(--dark2);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: linear-gradient(90deg, #0a1628 0%, #0d1e3a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+
+  .app-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .app-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.3px;
+  }
+
+  .app-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .badge-blue  { background: rgba(15,82,186,0.2); border: 1px solid rgba(15,82,186,0.4); color: #7EB3FF; }
+  .badge-green { background: rgba(0,200,151,0.15); border: 1px solid rgba(0,200,151,0.35); color: var(--green); }
+
+  /* ── MAIN GRID ── */
+  .main {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 480px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: #0a1220;
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sidebar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 8px;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  .sidebar-label:first-child { margin-top: 0; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-item.active {
+    background: rgba(15,82,186,0.18);
+    border: 1px solid rgba(15,82,186,0.3);
+    color: #7EB3FF;
+  }
+
+  .nav-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .nav-item.active .dot { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+
+  /* Stack pills */
+  .stack-section { margin-top: auto; }
+
+  .stack-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .sp-pbi  { background: rgba(243,151,0,0.12); border: 1px solid rgba(243,151,0,0.25); color: #F39700; }
+  .sp-sql  { background: rgba(0,194,203,0.10); border: 1px solid rgba(0,194,203,0.25); color: var(--cyan); }
+  .sp-xl   { background: rgba(0,200,151,0.10); border: 1px solid rgba(0,200,151,0.25); color: var(--green); }
+
+  /* ── CONTENT ── */
+  .content {
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* KPI Row */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .kpi-card.c1::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+  .kpi-card.c2::before { background: linear-gradient(90deg, var(--green), #00E5A0); }
+  .kpi-card.c3::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+  .kpi-card.c4::before { background: linear-gradient(90deg, #A855F7, var(--blue-lt)); }
+
+  .kpi-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-change {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .up   { color: var(--green); }
+  .down { color: var(--orange); }
+
+  /* Middle row */
+  .mid-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 14px;
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .panel-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* Bar chart – Campaign ROI */
+  .bar-chart { display: flex; flex-direction: column; gap: 9px; }
+
+  .bc-row { display: flex; align-items: center; gap: 10px; }
+  .bc-key { font-size: 11px; color: var(--muted); width: 72px; flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 9.5px; }
+  .bc-track { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+  .bc-fill  { height: 100%; border-radius: 4px; animation: growBar 1.2s cubic-bezier(0.16,1,0.3,1) both; }
+  .bc-val   { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text); width: 36px; text-align: right; }
+
+  @keyframes growBar {
+    from { transform: scaleX(0); transform-origin: left; }
+    to   { transform: scaleX(1); }
+  }
+
+  /* RFM Segment donut */
+  .rfm-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .rfm-donut { position: relative; }
+  .rfm-donut svg { display: block; }
+
+  .rfm-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+  }
+
+  .rfm-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--cyan);
+    line-height: 1;
+  }
+
+  .rfm-sub {
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .rfm-legend { width: 100%; }
+
+  .rfm-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 6px;
+  }
+
+  .rfm-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+  .rfm-name { font-size: 11px; color: var(--muted); flex: 1; }
+  .rfm-val  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text); }
+
+  /* Bottom row */
+  .bot-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* Sparkline */
+  .sparkline-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .spark-label { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+  .spark-val   { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+
+  /* Churn gauge */
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+  /* Data source pills */
+  .source-pills { display: flex; flex-direction: column; gap: 7px; justify-content: center; }
+
+  .src-pill {
+    display: flex; align-items: center; gap: 9px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 8px 12px;
+  }
+
+  .src-icon { font-size: 14px; }
+  .src-name { font-size: 11px; color: var(--text); font-weight: 400; flex: 1; }
+  .src-count { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); }
+
+  .src-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 4px var(--green); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Project footer */
+  .proj-footer {
+    background: #070D1B;
+    border-top: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pf-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+  }
+
+  .pf-left span { color: var(--cyan); }
+
+  .pf-right {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="app-icon">📊</div>
+      <div>
+        <div class="app-title">Customer &amp; Marketing Analytics Dashboard</div>
+        <div class="app-sub">10,000+ customer records · Power BI · SQL · Excel · 2025</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="badge badge-blue">Power BI</div>
+      <div class="badge badge-green">Live KPIs</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-label">Navigation</div>
+      <div class="nav-item active"><div class="dot"></div> Overview</div>
+      <div class="nav-item"><div class="dot"></div> Demographics</div>
+      <div class="nav-item"><div class="dot"></div> Purchase Behavior</div>
+      <div class="nav-item"><div class="dot"></div> Campaign Performance</div>
+      <div class="nav-item"><div class="dot"></div> RFM Segmentation</div>
+
+      <div class="sidebar-label">Data Sources</div>
+      <div class="nav-item"><div class="dot"></div> CRM System</div>
+      <div class="nav-item"><div class="dot"></div> Sales Data</div>
+      <div class="nav-item"><div class="dot"></div> Marketing Data</div>
+
+      <div class="stack-section">
+        <div class="sidebar-label">Tech Stack</div>
+        <div class="stack-pill sp-pbi">⬛ Power BI + DAX</div>
+        <div class="stack-pill sp-sql">🔷 SQL · RFM Logic</div>
+        <div class="stack-pill sp-xl">🟩 Excel · Power Query</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- KPI ROW -->
+      <div class="kpi-row">
+        <div class="kpi-card c1">
+          <div class="kpi-label">CAC</div>
+          <div class="kpi-value">$38</div>
+          <div class="kpi-change down">↓ 12% vs last period</div>
+        </div>
+        <div class="kpi-card c2">
+          <div class="kpi-label">CLV</div>
+          <div class="kpi-value">$420</div>
+          <div class="kpi-change up">↑ 18% growth</div>
+        </div>
+        <div class="kpi-card c3">
+          <div class="kpi-label">Churn Rate</div>
+          <div class="kpi-value">6.4%</div>
+          <div class="kpi-change up">↓ 2.1% improved</div>
+        </div>
+        <div class="kpi-card c4">
+          <div class="kpi-label">Campaign ROI</div>
+          <div class="kpi-value">3.2×</div>
+          <div class="kpi-change up">↑ Top channel</div>
+        </div>
+      </div>
+
+      <!-- MID ROW -->
+      <div class="mid-row">
+
+        <!-- Campaign ROI bars -->
+        <div class="panel">
+          <div class="panel-title">Campaign ROI by Channel</div>
+          <div class="bar-chart">
+            <div class="bc-row">
+              <div class="bc-key">Email</div>
+              <div class="bc-track"><div class="bc-fill" style="width:92%; background:linear-gradient(90deg,#0F52BA,#3A7BD5); animation-delay:0.1s"></div></div>
+              <div class="bc-val">3.2×</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-key">Social</div>
+              <div class="bc-track"><div class="bc-fill" style="width:74%; background:linear-gradient(90deg,#00C2CB,#00E5D0); animation-delay:0.2s"></div></div>
+              <div class="bc-val">2.6×</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-key">Paid Search</div>
+              <div class="bc-track"><div class="bc-fill" style="width:58%; background:linear-gradient(90deg,#A855F7,#7C3AED); animation-delay:0.3s"></div></div>
+              <div class="bc-val">2.0×</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-key">Display</div>
+              <div class="bc-track"><div class="bc-fill" style="width:40%; background:linear-gradient(90deg,#FF6B35,#FFD166); animation-delay:0.4s"></div></div>
+              <div class="bc-val">1.4×</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-key">Referral</div>
+              <div class="bc-track"><div class="bc-fill" style="width:82%; background:linear-gradient(90deg,#00C897,#00E5A0); animation-delay:0.5s"></div></div>
+              <div class="bc-val">2.9×</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RFM Donut -->
+        <div class="panel">
+          <div class="panel-title">RFM Segmentation — Revenue Share</div>
+          <div class="rfm-wrap">
+            <div class="rfm-donut">
+              <svg width="110" height="110" viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#1a2540" stroke-width="16"/>
+                <!-- Champions 65% = 163deg -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#00C2CB" stroke-width="16"
+                  stroke-dasharray="163 90" stroke-dashoffset="40" stroke-linecap="butt"/>
+                <!-- Loyal 20% -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#3A7BD5" stroke-width="16"
+                  stroke-dasharray="50 203" stroke-dashoffset="-123" stroke-linecap="butt"/>
+                <!-- At Risk 15% -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#FF6B35" stroke-width="16"
+                  stroke-dasharray="38 215" stroke-dashoffset="-173" stroke-linecap="butt"/>
+              </svg>
+              <div class="rfm-center">
+                <div class="rfm-pct">65%</div>
+                <div class="rfm-sub">Top Segment</div>
+              </div>
+            </div>
+            <div class="rfm-legend">
+              <div class="rfm-item">
+                <div class="rfm-dot" style="background:#00C2CB"></div>
+                <div class="rfm-name">Champions</div>
+                <div class="rfm-val">65% rev</div>
+              </div>
+              <div class="rfm-item">
+                <div class="rfm-dot" style="background:#3A7BD5"></div>
+                <div class="rfm-name">Loyal Customers</div>
+                <div class="rfm-val">20% rev</div>
+              </div>
+              <div class="rfm-item">
+                <div class="rfm-dot" style="background:#FF6B35"></div>
+                <div class="rfm-name">At Risk</div>
+                <div class="rfm-val">15% rev</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOT ROW -->
+      <div class="bot-row">
+
+        <!-- CLV trend sparkline -->
+        <div class="panel">
+          <div class="panel-title">CLV Trend — 12 Months</div>
+          <svg width="100%" height="60" viewBox="0 0 220 60" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="clvGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00C2CB" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#00C2CB" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,50 L18,46 L36,42 L54,38 L72,34 L90,30 L108,26 L126,22 L144,18 L162,14 L180,10 L198,8 L220,5"
+              fill="none" stroke="#00C2CB" stroke-width="2" stroke-linecap="round"/>
+            <path d="M0,50 L18,46 L36,42 L54,38 L72,34 L90,30 L108,26 L126,22 L144,18 L162,14 L180,10 L198,8 L220,5 L220,60 L0,60 Z"
+              fill="url(#clvGrad)"/>
+          </svg>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">Jan 2025</span>
+            <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green)">↑ +18% YTD</span>
+            <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">Dec 2025</span>
+          </div>
+        </div>
+
+        <!-- Churn gauge -->
+        <div class="panel">
+          <div class="panel-title">Churn Rate Gauge</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <svg width="120" height="66" viewBox="0 0 120 66">
+              <path d="M10,60 A50,50 0 0,1 110,60" fill="none" stroke="#1a2540" stroke-width="12" stroke-linecap="round"/>
+              <!-- 6.4% of 180deg = ~11.5deg arc -->
+              <path d="M10,60 A50,50 0 0,1 110,60" fill="none" stroke="#FF6B35" stroke-width="12"
+                stroke-linecap="round" stroke-dasharray="12 146" />
+              <path d="M10,60 A50,50 0 0,1 28,18" fill="none" stroke="#00C897" stroke-width="12"
+                stroke-linecap="round" stroke-dasharray="50 120" stroke-dashoffset="-12"/>
+              <text x="60" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-size="16" font-weight="800" fill="#E8EEF8">6.4%</text>
+            </svg>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green);letter-spacing:1px">↓ Improved from 8.5%</div>
+          </div>
+        </div>
+
+        <!-- Data sources -->
+        <div class="panel">
+          <div class="panel-title">Integrated Data Sources</div>
+          <div class="source-pills">
+            <div class="src-pill">
+              <div class="src-icon">🗄️</div>
+              <div class="src-name">CRM System</div>
+              <div class="src-count">10K+ records</div>
+              <div class="src-dot"></div>
+            </div>
+            <div class="src-pill">
+              <div class="src-icon">💰</div>
+              <div class="src-name">Sales Data</div>
+              <div class="src-count">Transactional</div>
+              <div class="src-dot"></div>
+            </div>
+            <div class="src-pill">
+              <div class="src-icon">📣</div>
+              <div class="src-name">Marketing Data</div>
+              <div class="src-count">5 channels</div>
+              <div class="src-dot"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="proj-footer">
+    <div class="pf-left">Built by <span>Siddiqul Afdad</span> · Power BI + DAX + SQL + Power Query · 2025</div>
+    <div class="pf-right">Customer &amp; Marketing Analytics</div>
+  </div>
+
+</div>
+</body>
+</html>
