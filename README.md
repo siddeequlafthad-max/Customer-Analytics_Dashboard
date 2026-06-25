@@ -43,7 +43,7 @@ README.md
 
 ### Main Dashboard
 
-![Dashboard](Screenshot 2026-06-11 161602.png)
+![Dashboard](dashboard-images/Screenshot%202026-06-11%20161602.png)
 
 ---
 
