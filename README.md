@@ -6,7 +6,8 @@
 (Replace with your GitHub Pages URL after deploying)
 ---
 📸 Preview
-![Dashboard Preview]<img width="553" height="401" alt="preview png" src="https://github.com/user-attachments/assets/32bb2625-a015-41d4-a865-2e769d96ac7b" />
+![Dashboard Preview]<img width="553" height="401" alt="preview png" src="<img width="665" height="347" alt="Screenshot 2026-06-11 161522" src="https://github.com/user-attachments/assets/0944ec13-569c-40a4-a5e8-857c6b198b39" />
+" />
 
 ---
 📌 Project Overview
