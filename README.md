@@ -43,7 +43,8 @@ README.md
 
 ### Main Dashboard
 
-![Dashboard](dashboard-images/Screenshot%202026-06-11%20161602.png)
+<img width="662" height="338" alt="Screenshot 2026-06-11 161602" src="https://github.com/user-attachments/assets/e1c3afc0-e646-4fc8-afd5-357fb8833edd" />
+
 
 ---
 
